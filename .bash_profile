@@ -10,7 +10,7 @@ if [ "$(uname)" == "Darwin" ]; then
   export PATH=/usr/local/opt/openssl/bin:$PATH
 elif [ "$(expr substr $(uname) 1 6)" == "CYGWIN" ]; then
   alias ll='ls -laF --color'
-  export JAVA_HOME=/C/hiyoko/apps/Java/jdk1.8.0_144/bin
+  export JAVA_HOME=/c/hiyoko/apps/Java/jdk1.8.0_144/bin
   export LESSOPEN='| /usr/bin/src-hilite-lesspipe.sh %s'
 else
   echo Unknown OS
