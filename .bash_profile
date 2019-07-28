@@ -7,14 +7,16 @@ if [ "$(uname)" == "Darwin" ]; then
 elif [ "$(uname)" == "Linux" ]; then
   alias ll='ls -laF --color'
   export JAVA_HOME=/mnt/c/hiyoko/apps/Java/jdk1.8.0_192/bin
-  export LESSOPEN='| /usr/share/source-highlight/src-hilite-lesspipe.sh %s'
-  PATH=/mnt/c/hiyoko/apps/Java/jre1.8.0_192/bin:/mnt/c/hiyoko/apps/Java/jdk1.8.0_192/bin:$PATH
+  #export LESSOPEN='| /usr/share/source-highlight/src-hilite-lesspipe.sh %s'
+  PATH=/mnt/c/hiyoko/apps:/mnt/c/hiyoko/apps/Java/jre1.8.0_192/bin:/mnt/c/hiyoko/apps/Java/jdk1.8.0_192/bin:$PATH
   #shopt -s expand_aliases
   #set -o igncr
 else
   echo Unknown OS
 fi
 alias grep='grep --color -n '
+alias mntk='sudo mount -t drvfs k: /mnt/k -o metadata,umask=022'
+alias umntk='sudo umount /mnt/k'
 export PATH
 export _JAVA_OPTIONS='-Dfile.encoding=UTF-8'
 export LESS='-I -R -N -M -W -x2'
