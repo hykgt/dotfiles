@@ -6,9 +6,9 @@ if [ "$(uname)" == "Darwin" ]; then
   PATH=/usr/local/opt/openssl/bin:$PATH
 elif [ "$(uname)" == "Linux" ]; then
   alias ll='ls -laF --color'
-  export JAVA_HOME=/mnt/c/hiyoko/apps/Java/jdk1.8.0_192/bin
+  export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
   #export LESSOPEN='| /usr/share/source-highlight/src-hilite-lesspipe.sh %s'
-  PATH=/mnt/c/hiyoko/apps:/mnt/c/hiyoko/apps/Java/jre1.8.0_192/bin:/mnt/c/hiyoko/apps/Java/jdk1.8.0_192/bin:$PATH
+  PATH=/mnt/c/hiyoko/apps:$PATH
   #shopt -s expand_aliases
   #set -o igncr
 else
