@@ -15,7 +15,8 @@ else
   echo Unknown OS
 fi
 alias grep='grep --color -n '
-alias mntk='sudo mount -t drvfs k: /mnt/k -o metadata,umask=022,fmask=11'
+#alias mntk='sudo mount -t drvfs k: /mnt/k -o metadata,umask=22,fmask=11'
+alias mntk='sudo mount -t drvfs k:\\ /mnt/k -o noatime,uid=1000,gid=1000,metadata,umask=22,fmask=11'
 alias umntk='sudo umount /mnt/k'
 export PATH
 export _JAVA_OPTIONS='-Dfile.encoding=UTF-8'
