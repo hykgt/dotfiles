@@ -1,0 +1,35 @@
+openssl req -new -x509 -config openssl.cfg -extensions rca -newkey rsa:2048 -passout pass:cisco123 -subj "/C=JP/ST=Tokyo/L=Roppongi/O=HogeSystems/OU=RCA/CN=rca.hogesystems.com/emailAddress=rca-admin@hogesystems.com" -days 3650 -keyout rcakey.pem > rcacrt.pem
+
+
+openssl req -new -sha256 -newkey rsa:2048 -passout pass:cisco1 -subj "/C=JP/ST=Tokyo/L=Roppongi/O=HogeSystems/OU=ICA/CN=ica.hogesystems.com/emailAddress=ica-admin@hogesystems.com" -reqexts EXTS -config <(cat ./openssl.cfg <(printf "\n[EXTS]\nsubjectKeyIdentifier=hash\nbasicConstraints=critical,CA:true,pathlen:0\nkeyUsage=critical,digitalSignature,cRLSign,keyCertSign")) -keyout icakey.pem > icacsr.pem
+
+openssl ca -notext -extensions EXTS -config <(cat ./openssl.cfg <(printf "\n[EXTS]\nauthorityKeyIdentifier=keyid,issuer\ncrlDistributionPoints=URI:http://www.hogesystems.com/revoke.crl\nauthorityInfoAccess=OCSP;URI:http://ocsp.hogesystems.com")) -md sha256 -keyfile rcakey.pem -cert rcacrt.pem -passin pass:cisco123 -in icacsr.pem -days 1825 > icacrt.pem -batch
+
+
+openssl req -new -sha256 -newkey rsa:2048 -passout pass:cisco -subj "/C=JP/ST=Tokyo/L=Roppongi/O=HogeSystems/OU=CX/CN=cse01/emailAddress=cse01@hogesystems.com" -reqexts EXTS -config <(cat ./openssl.cfg <(printf "\n[EXTS]\nsubjectKeyIdentifier=hash\nbasicConstraints=CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth,emailProtection")) -keyout usr01key.pem > usr01csr.pem
+
+openssl req -new -sha256 -newkey rsa:2048 -passout pass:cisco -subj "/C=JP/ST=Tokyo/L=Roppongi/O=HogeSystems/OU=CX/CN=svr01.hogesystems.com" -reqexts EXTS -config <(cat ./openssl.cfg <(printf "\n[EXTS]\nsubjectKeyIdentifier=hash\nbasicConstraints=CA:FALSE\nsubjectAltName=DNS:isemta.hiyokocisco.com,DNS:isemtacpp.hiyokocisco.com,DNS:www.hogesystems.com,IP:172.31.1.150,IP:1.150.0.197,IP:10.71.228.47\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=serverAuth")) -keyout svr01key.pem > svr01csr.pem
+
+
+openssl ca -notext -extensions EXTS -config <(cat ./openssl.cfg <(printf "\n[EXTS]\nauthorityKeyIdentifier=keyid,issuer\ncrlDistributionPoints=URI:http://www.hogesystems.com/revoke.crl\nauthorityInfoAccess=OCSP;URI:http://ocsp.hogesystems.com")) -md sha256 -keyfile icakey.pem -cert icacrt.pem -passin pass:cisco1 -in usr01csr.pem -days 365 > usr01crt.pem -batch
+
+
+openssl ca -config openssl.cfg -md sha256 -cert icacrt.pem -keyfile icakey.pem -passin pass:cisco1 -revoke usr01crt.pem
+
+openssl ca -gencrl -config openssl.cfg -md sha256 -cert icacrt.pem -keyfile icakey.pem -passin pass:cisco1 -crldays 30 > icacrl.pem
+
+
+openssl req -new -sha256 -newkey rsa:2048 -passout pass:cisco -subj "/C=JP/ST=Tokyo/L=Roppongi/O=HogeSystems/OU=CX/CN=iocsp.hogesystems.com" -reqexts EXTS -config <(cat ./openssl.cfg <(printf "\n[EXTS]\nsubjectKeyIdentifier=hash")) -keyout iocspkey.pem > iocspcsr.pem -batch
+
+openssl ca -notext -extensions EXTS -config <(cat ./openssl.cfg <(printf "\n[EXTS]\nbasicConstraints=CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment,nonRepudiation\nextendedKeyUsage=critical,OCSPSigning\nauthorityInfoAccess=OCSP;URI:http://ocsp.hogesystems.com:2560")) -md sha256 -keyfile icakey.pem -cert icacrt.pem -passin pass:cisco1 -in iocspcsr.pem -days 365 -out iocspcrt.pem -batch
+
+
+openssl req -new -x509 -config openssl.cfg -extensions rca -newkey ec:<(openssl ecparam -name prime256v1) -keyout rcakey.pem -subj "/C=JP/ST=Tokyo/L=Roppongi/O=HogeSign.com/OU=RCA/CN=rca.hogesign.com/emailAddress=rca-admin@hogesign.com" -days 3650 >rcacrt.pem
+
+openssl req -new -sha256 -newkey ec:<(openssl ecparam -name secp521r1) -passout pass:cisco -subj "/C=JP/ST=Tokyo/L=Roppongi/O=HogeSystems/OU=CX/CN=cse01/emailAddress=cse01@hogesystems.com" -reqexts EXTS -config <(cat ./openssl.cfg <(printf "\n[EXTS]\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth,emailProtection")) -keyout usr01key.pem > usr01csr.pem
+
+
+openssl pkcs12 -info < usr01crt.p12
+openssl genpkey -algorithm x25519 > x25519.pem
+openssl pkey -text < x25519.pem
+
